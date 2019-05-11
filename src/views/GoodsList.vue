@@ -6,11 +6,23 @@
         <div>
             <router-view></router-view>
         </div>
+        <router-link to="/cart">跳转到购物车页面</router-link>
+        <button @click="jump">button-跳转到购物车页面</button>
     </div>
     
 </template>
 <script>
 export default {
-    
+    data: {
+        return(){
+
+        }
+    },
+    methods: {
+        jump(){
+            // this.$router.push('/cart')
+            this.$router.go(-2)
+        }
+    }
 }
 </script>

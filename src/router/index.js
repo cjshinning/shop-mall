@@ -4,6 +4,7 @@ import HelloWorld from '@/components/HelloWorld'
 import GoodsList from './../views/GoodsList'
 import Title from './../views/Title'
 import Image from './../views/Image'
+import Cart from './../views/Cart'
 
 Vue.use(Router)
 
@@ -25,6 +26,11 @@ export default new Router({
           component: Image
         }
       ]
+    },
+    {
+      path: '/cart',
+      name: 'cart',
+      component: Cart
     }
   ]
 })
