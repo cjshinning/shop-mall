@@ -96,9 +96,9 @@ export default {
     },
     methods: {
         getGoodsList(){
-            axios.get('/goods/list').then(result=>{
+            axios.get('/goods').then(result=>{
                 var res = result.data;
-                this.goodsList = res.result;
+                this.goodsList = res.result.list;
             })
         },
         showFilterPop(){
