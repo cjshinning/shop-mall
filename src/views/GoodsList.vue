@@ -47,7 +47,7 @@
                 </li>
               </ul>
               <div class="load-more" v-infinite-scroll="loadMore" infinite-scroll-disabled="busy" infinite-scroll-distance="30">
-                加载中...
+                <img src="./../assets/loading-spinning-bubbles.svg" v-show="loading" alt="">
               </div>
             </div>
           </div>
@@ -86,6 +86,10 @@ export default {
             priceFilter: [
               {
                 startPrice: 0.00,
+                endPrice: 100.00
+              },
+              {
+                startPrice: 100.00,
                 endPrice: 500.00
               },
               {
@@ -98,7 +102,8 @@ export default {
               }
             ],
             priceChecked: 'all',
-            filterBy: false
+            filterBy: false,
+            loading: false
         }
     },
     components: {
@@ -114,27 +119,30 @@ export default {
           let param = {
             page: this.page,
             pageSize: this.pageSize,
-            sort: this.sortFlag?1:-1
+            sort: this.sortFlag?1:-1,
+            priceLevel: this.priceChecked
           }
+          this.loading = true;
           axios.get('/goods',{
             params: param
           }).then(result=>{
-              let res = result.data;
-              if(res.status == '0'){
-                if(flag){
-                  this.goodsList = this.goodsList.concat(res.result.list);
-                  if(res.result.count==0){
-                    this.busy = true;
-                  }else{
-                    this.busy = false;
-                  }
+            this.loading = false;
+            let res = result.data;
+            if(res.status == '0'){
+              if(flag){
+                this.goodsList = this.goodsList.concat(res.result.list);
+                if(res.result.count==0){
+                  this.busy = true;
                 }else{
-                  this.goodsList = res.result.list;
                   this.busy = false;
                 }
               }else{
-                this.goodsList = [];
+                this.goodsList = res.result.list;
+                this.busy = false;
               }
+            }else{
+              this.goodsList = [];
+            }
           })
         },
         sortGoods(){
@@ -153,8 +161,10 @@ export default {
           this.filterBy = true;
         },
         setPriceFilter(index){
+          this.page = 1;
           this.priceChecked=index;
           this.closePop();
+          this.getGoodsList();
         },
         closePop(){
           this.filterBy = false;
