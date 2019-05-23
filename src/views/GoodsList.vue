@@ -54,6 +54,26 @@
         </div>
       </div>
     </div>
+    <Modal v-bind:mdShow="mdShow" v-on:close="closeModal">
+      <p slot="message">
+        请先登录，否则无法加入购物车
+      </p>
+      <div slot="btnGroup">
+        <a href="javascript:;" class="btn btn--m" @click="mdShow = false">关闭</a>
+      </div>
+    </Modal>
+    <Modal v-bind:mdShow="mdShowCart" v-on:close="closeModal">
+      <p slot="message">
+        <svg class="icon-status-ok">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#icon-status-ok"></use>
+        </svg>
+        <span>加入购物车成功！</span>
+      </p>
+      <div slot="btnGroup">
+        <a href="javascript:;" class="btn btn--m" @click="mdShowCart = false">继续购物</a>
+        <router-link href="javascript:;" class="btn btn--m" to="/cart">查看购物车</router-link> 
+      </div>
+    </Modal>
     <nav-footer></nav-footer>
   </div>
 </template>
@@ -62,6 +82,10 @@
   height: 100px;
   line-height: 100px;
   text-align: center;
+}
+.btn:hover{
+  background-color: #ffe5e6;
+  transition: all .3s ease-out;
 }
 </style>
 
@@ -74,6 +98,7 @@ import './../assets/css/checkout.css'
 import NavHeader from './../components/NavHeader'
 import NavFooter from './../components/NavFooter'
 import NavBread from './../components/NavBread'
+import Modal from './../components/Modal'
 import axios from 'axios'
 export default {
     data(){
@@ -83,6 +108,8 @@ export default {
             page: 1,
             pageSize: 8,
             busy: true,
+            mdShow: false,
+            mdShowCart: false,
             priceFilter: [
               {
                 startPrice: 0.00,
@@ -109,7 +136,8 @@ export default {
     components: {
         NavHeader,
         NavFooter,
-        NavBread
+        NavBread,
+        Modal
     },
     mounted(){
         this.getGoodsList();
@@ -123,11 +151,11 @@ export default {
             priceLevel: this.priceChecked
           }
           this.loading = true;
-          axios.get('/goods',{
+          axios.get('/goods/list',{
             params: param
-          }).then(result=>{
+          }).then(response=>{
             this.loading = false;
-            let res = result.data;
+            let res = response.data;
             if(res.status == '0'){
               if(flag){
                 this.goodsList = this.goodsList.concat(res.result.list);
@@ -162,9 +190,9 @@ export default {
             productId: productId
           }).then(res=>{
             if(res.data.status == 0){
-              alert('加入成功')
+              this.mdShowCart = true;
             }else{
-              alert(`msg:${res.data.msg}`)
+              this.mdShow = true;
             }
           })
         },
@@ -179,6 +207,9 @@ export default {
         },
         closePop(){
           this.filterBy = false;
+        },
+        closeModal(){
+          this.mdShow = false;
         }
     }
 }
