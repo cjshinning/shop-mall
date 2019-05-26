@@ -156,4 +156,38 @@ router.post('/editCart', function(req,res,next){
   })
 })
 
+router.post('/editCheckAll', function(req,res,next){
+  let userId = req.cookies.userId,
+      checkAll = req.body.checkAll?'1':'0';
+
+  User.findOne({userId: userId}, function(err, doc){
+    if(err){
+      res.json({
+        status: '1',
+        msg:err.message
+      })
+    }else{
+      if(doc){
+        doc.cartList.forEach(item=>{
+          item.checked = checkAll;
+        })
+        doc.save(function(err1, doc1){
+          if(err){
+            res.json({
+              status: '1',
+              msg:err1.message
+            })
+          }else{
+            res.json({
+              status: '0',
+              msg: '',
+              result: 'suc'
+            })
+          }
+        })
+      }
+    }
+  })
+})
+
 module.exports = router;
