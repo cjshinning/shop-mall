@@ -193,6 +193,7 @@ router.post('/editCheckAll', function(req,res,next){
 // 查询地址列表
 router.get('/addressList', function(req, res, next){
   let userId = req.cookies.userId;
+  let addressId = req.body.addressId;
   User.findOne({userId: userId}, function(err, doc){
     if(err){
       res.json({
@@ -204,6 +205,82 @@ router.get('/addressList', function(req, res, next){
         status: '0',
         msg: '',
         result: doc.addressList
+      })
+    }
+  })
+})
+
+// 设置默认地址
+router.post('/setDefault', function(req,res,next){
+  let userId = req.cookies.userId;
+  let addressId = req.body.addressId;
+  if(!addressId){
+    res.json({
+      status: '1003',
+      msg: '',
+      result: 'addressId is null'
+    })
+  }
+  User.findOne({userId:userId}, function(err, doc){
+    if(err){
+      res.json({
+        status: '1',
+        msg: err.message,
+        result: ''
+      })
+    }else{
+      let addressList = doc.addressList;
+      addressList.forEach(item=>{
+        if(item.addressId == addressId){
+          item.isDefault = true;
+        }else{
+          item.isDefault = false;
+        }
+      })
+      
+      doc.save(function(err1, doc1){
+        if(err1){
+          res.json({
+            status: '1',
+            msg: err.message,
+            result: ''
+          })
+        }else{
+          res.json({
+            status: '0',
+            msg: '',
+            result: ''
+          })
+        }
+      })
+    }
+  })
+})
+
+// 删除地址接口
+router.post('/delAddress', function(req,res,next){
+  let userId = req.cookies.userId,
+      addressId = req.body.addressId;
+
+  User.update({
+    userId: userId
+  },{
+    $pull: {
+      'addressList': {
+        'addressId': addressId
+      }
+    }
+  }, function(err, doc){
+    if(err){
+      res.json({
+        status: '1',
+        msg:err.message
+      })
+    }else{
+      res.json({
+        status: '0',
+        msg: '',
+        result: 'suc'
       })
     }
   })
