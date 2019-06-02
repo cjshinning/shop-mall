@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="cart-tab-5">
                                     <div class="cart-item-opration">
-                                        <a href="javascript:;" class="item-edit-btn" @click="delCartConfirm(item.productId)">
+                                        <a href="javascript:;" class="item-edit-btn" @click="delCartConfirm(item)">
                                         <svg class="icon icon-del">
                                             <use xlink:href="#icon-del"></use>
                                         </svg>
@@ -174,7 +174,7 @@ export default {
     data(){
         return {
             cartList: [],
-            productId: '',
+            delItem: {},
             modalConfirm: false
         }
     },
@@ -220,21 +220,23 @@ export default {
                     }
                 })
         },
-        delCartConfirm(productId){
+        delCartConfirm(item) {
+            this.delItem = item;
             this.modalConfirm = true;
-            this.productId = productId;
+            // this.productId = productId;
         },
         closeModal(){
             this.modalConfirm = false;
         },
         delCart(){
             axios.post('/users/cartDel',{
-                productId: this.productId
+                productId: this.delItem.productId
             }).then(response=>{
                 let res = response.data;
                 if(res.status == '0'){
                     this.modalConfirm = false;
                     this.init();
+                    this.$store.commit('updateCartCount',  -this.delItem.productNum);
                 }
             })
         },
@@ -253,9 +255,13 @@ export default {
                 checked: item.checked
             }).then(response=>{
                 let res = response.data;
-                if(res.status == '0'){
-
+                let num = 0;
+                if(flag == 'add'){
+                    num = 1;
+                }else if(flag == 'minu'){
+                    num = -1;
                 }
+                this.$store.commit('updateCartCount',  num);
             })
         },
         toggleCheckAll(){

@@ -1,9 +1,6 @@
 <template>
     <div>
         <nav-header></nav-header>
-        <nav-bread>
-            <span>Order Confirm</span>
-        </nav-bread>
         <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <defs>
             <symbol id="icon-add" viewBox="0 0 32 32">
@@ -111,7 +108,7 @@
                     </li>
                     <li class="order-total-price">
                     <span>Order total:</span>
-                    <span>{{orderTatal | currency('$')}}</span>
+                    <span>{{orderTotal | currency('$')}}</span>
                     </li>
                 </ul>
                 </div>
@@ -119,10 +116,10 @@
 
             <div class="order-foot-wrap">
                 <div class="prev-btn-wrap">
-                <button class="btn btn--m">Previous</button>
+                    <router-link class="btn btn--m" to="/address">Previous</router-link>
                 </div>
                 <div class="next-btn-wrap">
-                <button class="btn btn--m btn--red">Proceed to payment</button>
+                <button class="btn btn--m btn--red" @click="payMent">Proceed to payment</button>
                 </div>
             </div>
             </div>
@@ -144,7 +141,7 @@ export default {
             discount: 200,
             tax: 400,
             subTotal: 0,
-            orderTatal: 0
+            orderTotal: 0
         }
     },
     mounted(){
@@ -166,8 +163,24 @@ export default {
                         }
                     })
 
-                    this.orderTatal = this.subTotal + this.shipping - this.discount + this.tax;
+                    this.orderTotal = this.subTotal + this.shipping - this.discount + this.tax;
                 })
+        },
+        payMent(){
+            console.log(this.orderTotal)
+            let addressId = this.$route.query.addressId;
+            axios.post('users/payMent',{
+                addressId: addressId,
+                orderTotal: this.orderTotal
+            }).then((response)=>{
+                let res = response.data;
+                if(res.status == '0'){
+                    console.log('order created success.')
+                    this.$router.push({
+                        path: '/orderSuccess?orderId='+res.result.orderId
+                    })
+                }
+            })
         }
     },
     components: {
